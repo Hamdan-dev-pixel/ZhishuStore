@@ -60,16 +60,6 @@
 <section class="queue-list hidden" id="wdpPage"></section>
 <section class="queue-list hidden" id="skinPage"></section>
 
-<style>
-.queue-card{background:#fff;padding:18px;border-radius:18px;box-shadow:0 4px 8px rgba(0,0,0,0.1);margin-bottom:18px}
-.queue-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.tag{background:#f5f5f5;padding:6px 12px;border-radius:12px;font-size:14px}
-.status{padding:6px 12px;border-radius:12px;color:#fff;font-size:14px}
-.status.menunggu{background:#f59e0b}
-.status.diproses{background:#3b82f6}
-.status.selesai{background:#10b981}
-</style>
-
 <script>
 /* ================= UI ================= */
 let currentPage = "semua";
@@ -149,15 +139,33 @@ function renderCard(item,index){
       <div class="tag">#${index+1}</div>
       <div class="status ${item.status}">${item.status.toUpperCase()}</div>
     </div>
+
     <div class="info-grid">
-      <div><small>NAMA</small><h3>${item.nama}</h3></div>
-      <div><small>PRODUK</small><h3>${item.produk}</h3></div>
-      <div><small>ID SERVER</small><h3>${item.server}</h3></div>
-      <div><small>NICKNAME</small><h3>${item.nickname}</h3></div>
-      <div><small>KATEGORI</small><h3>${item.kategori}</h3></div>
-      <div><small>TANGGAL</small><h3>${item.tanggal}</h3></div>
-      <div><small>ESTIMASI</small><h3>${item.estimasi}</h3></div>
+
+  <div class="info-row">
+    <div class="info"><small>NAMA</small><h3>${item.nama}</h3></div>
+    <div class="info"><small>PRODUK</small><h3>${item.produk}</h3></div>
+  </div>
+
+  <div class="info-row">
+    <div class="info"><small>ID SERVER</small><h3>${item.server}</h3></div>
+    <div class="info"><small>NICKNAME</small><h3>${item.nickname}</h3></div>
+  </div>
+
+  <div class="info-row">
+    <div class="info"><small>KATEGORI</small><h3>${item.kategori}</h3></div>
+    <div class="info"><small>TANGGAL</small><h3>${item.tanggal}</h3></div>
+  </div>
+
+  <div class="info-row">
+    <div class="info"><small>ESTIMASI</small><h3>${item.estimasi}</h3></div>
+    <div class="info">
+      <small>TRANSAKSI</small>
+      <h3>${item.status === "selesai" ? "DONE" : "PENDING"}</h3>
     </div>
+  </div>
+
+</div>
   </div>`;
 }
 
