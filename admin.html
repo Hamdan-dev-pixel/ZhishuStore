@@ -11,23 +11,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-<script>
-
-const SUPABASE_URL =
-"https://bbvgmeqakkdjmiarafqt.supabase.co";
-
-const SUPABASE_KEY =
-"sb_publishable_aG3d7IGH0xsJZogxdRNP-A_QkQXK97a";
-
-const supabase =
-window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
-</script>
 <body>
 
   <div class="topbar"></div>
@@ -145,229 +128,7 @@ id="estimasiOrder">
   id="adminList">
 
   </section>
-
-  <script>
-let dataAntrian = [];
-
-const adminList =
-document.getElementById("adminList");
-
-async function renderAdmin(){
-
-  const {
-    data,
-    error
-  } = await supabase
-  .from("antrian")
-  .select("*")
-  .order("id",{ascending:false});
-
-  if(error){
-
-    console.log(error);
-    return;
-
-  }
-
-  dataAntrian = data;
-
-  adminList.innerHTML = "";
-
-  dataAntrian.forEach((item,index)=>{
-
-    adminList.innerHTML += `
-
-      <div class="queue-card">
-
-        <div class="queue-top">
-
-          <div class="tag">
-            #${index + 1}
-          </div>
-
-          <div class="status ${item.status}">
-            ${item.status.toUpperCase()}
-          </div>
-
-        </div>
-
-        <div class="info-grid">
-
-          <div class="info">
-            <small>NAMA</small>
-            <h3>${item.nama}</h3>
-          </div>
-
-          <div class="info">
-            <small>PRODUK</small>
-            <h3>${item.produk}</h3>
-          </div>
-
-          <div class="info">
-            <small>ID SERVER</small>
-            <h3>${item.server}</h3>
-          </div>
-
-          <div class="info">
-            <small>NICKNAME</small>
-            <h3>${item.nickname}</h3>
-          </div>
-
-        </div>
-
-        <div class="admin-action">
-
-          <button onclick="ubahStatus(${item.id},'menunggu')"
-          class="yellow-btn">
-            Menunggu
-          </button>
-
-          <button onclick="ubahStatus(${item.id},'diproses')"
-          class="blue-btn">
-            Diproses
-          </button>
-
-          <button onclick="ubahStatus(${item.id},'selesai')"
-          class="green-btn">
-            Selesai
-          </button>
-
-          <button onclick="hapusOrder(${item.id})"
-          class="red-btn">
-            Hapus
-          </button>
-
-        </div>
-
-      </div>
-
-    `;
-
-  });
-
-}
-
-async function ubahStatus(id,status){
-
-  await supabase
-  .from("antrian")
-  .update({
-    status:status
-  })
-  .eq("id",id);
-
-  renderAdmin();
-
-}
-
-async function hapusOrder(id){
-
-  await supabase
-  .from("antrian")
-  .delete()
-  .eq("id",id);
-
-  renderAdmin();
-
-}
-
-renderAdmin();
-
-supabase
-.channel("admin-realtime")
-.on(
-  "postgres_changes",
-  {
-    event:"*",
-    schema:"public",
-    table:"antrian"
-  },
-  payload => {
-
-    renderAdmin();
-
-  }
-)
-.subscribe();
-async function tambahOrder(){
-
-  const nama =
-  document.getElementById("nama").value;
-
-  const produk =
-  document.getElementById("produk").value;
-
-  const server =
-  document.getElementById("server").value;
-
-  const nickname =
-  document.getElementById("nickname").value;
-
-  const status =
-  document.getElementById("statusSelect").value;
-
-  const kategori =
-  document.getElementById("kategoriSelect").value;
-
-  const tanggal =
-  document.getElementById("tanggalOrder").value;
-
-  const estimasi =
-  document.getElementById("estimasiOrder").value;
-
-  if(
-    nama == "" ||
-    produk == "" ||
-    server == "" ||
-    nickname == "" ||
-    tanggal == "" ||
-    estimasi == ""
-  ){
-
-    alert("Lengkapi data");
-    return;
-
-  }
-
-  const { error } =
-  await supabase
-  .from("antrian")
-  .insert([{
-
-    nama:nama,
-    produk:produk,
-    server:server,
-    nickname:nickname,
-    status:status,
-    kategori:kategori,
-    tanggal:tanggal,
-    estimasi:estimasi
-
-  }]);
-
-  if(error){
-
-    console.log(error);
-    alert("Gagal tambah order");
-    return;
-
-  }
-
-  alert("Order berhasil ditambahkan");
-
-  document.getElementById("nama").value = "";
-  document.getElementById("produk").value = "";
-  document.getElementById("server").value = "";
-  document.getElementById("nickname").value = "";
-  document.getElementById("tanggalOrder").value = "";
-  document.getElementById("estimasiOrder").value = "";
-
-  renderAdmin();
-
-}
-  </script>
-
-  <style>
+<style>
     #kategoriSelect{
   padding:18px;
   border:none;
@@ -432,5 +193,112 @@ async function tambahOrder(){
 
   </style>
 
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  updateDoc,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBvAFRVVUmx8zrfa9E8EprvaTjtDyVgM-4",
+  authDomain: "order-2ed47.firebaseapp.com",
+  projectId: "order-2ed47",
+  storageBucket: "order-2ed47.firebasestorage.app",
+  messagingSenderId: "1063088764123",
+  appId: "1:1063088764123:web:0565ef484740fb6a94c8fe"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const adminList = document.getElementById("adminList");
+
+/* REALTIME */
+onSnapshot(collection(db, "antrian"), (snapshot) => {
+  adminList.innerHTML = "";
+
+  snapshot.forEach((item) => {
+    const data = item.data();
+
+    adminList.innerHTML += `
+      <div class="queue-card">
+
+        <div class="queue-top">
+          <div class="tag">#${item.id.slice(0,4)}</div>
+          <div class="status ${data.status}">
+            ${data.status.toUpperCase()}
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info"><small>NAMA</small><h3>${data.nama}</h3></div>
+          <div class="info"><small>PRODUK</small><h3>${data.produk}</h3></div>
+          <div class="info"><small>ID SERVER</small><h3>${data.server}</h3></div>
+          <div class="info"><small>NICKNAME</small><h3>${data.nickname}</h3></div>
+        </div>
+
+        <div class="admin-action">
+          <button onclick="ubahStatus('${item.id}','menunggu')" class="yellow-btn">Menunggu</button>
+          <button onclick="ubahStatus('${item.id}','diproses')" class="blue-btn">Diproses</button>
+          <button onclick="ubahStatus('${item.id}','selesai')" class="green-btn">Selesai</button>
+          <button onclick="hapusOrder('${item.id}')" class="red-btn">Hapus</button>
+        </div>
+
+      </div>
+    `;
+  });
+});
+
+/* TAMBAH */
+window.tambahOrder = async function () {
+
+  const nama = document.getElementById("nama").value;
+  const produk = document.getElementById("produk").value;
+  const server = document.getElementById("server").value;
+  const nickname = document.getElementById("nickname").value;
+  const status = document.getElementById("statusSelect").value;
+  const kategori = document.getElementById("kategoriSelect").value;
+  const tanggal = document.getElementById("tanggalOrder").value;
+  const estimasi = document.getElementById("estimasiOrder").value;
+
+  if (!nama || !produk || !server || !nickname) {
+    alert("Lengkapi data!");
+    return;
+  }
+
+  await addDoc(collection(db, "antrian"), {
+    nama,
+    produk,
+    server,
+    nickname,
+    status,
+    kategori,
+    tanggal,
+    estimasi,
+    createdAt: Date.now()
+  });
+
+  alert("Order berhasil!");
+};
+
+/* UPDATE */
+window.ubahStatus = async function (id, status) {
+  await updateDoc(doc(db, "antrian", id), {
+    status
+  });
+};
+
+/* DELETE */
+window.hapusOrder = async function (id) {
+  await deleteDoc(doc(db, "antrian", id));
+};
+
+</script>
 </body>
 </html>
