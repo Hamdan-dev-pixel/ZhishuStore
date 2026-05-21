@@ -1,14 +1,3 @@
-const SUPABASE_URL =
-"https://bbvgmeqakkdjmiarafqt.supabase.co";
-
-const SUPABASE_KEY =
-"sb_publishable_aG3d7IGH0xsJZogxdRNP-A_QkQXK97a";
-
-const supabase =
-window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
 let currentPage = "semua";
 
 const semuaPage =
@@ -192,13 +181,10 @@ function renderCard(item,index){
 
 }
 
-async function ambilData(){
+function ambilData(){
 
-  const { data:dataAntrian } =
-await supabase
-.from("antrian")
-.select("*")
-.order("id",{ascending:false});
+  const dataAntrian =
+  JSON.parse(localStorage.getItem("antrian")) || [];
 
   semuaPage.innerHTML = "";
   starlightPage.innerHTML = "";
@@ -437,19 +423,3 @@ function loginAdmin(){
   }
 
 }
-supabase
-.channel("antrian-channel")
-.on(
-  "postgres_changes",
-  {
-    event:"*",
-    schema:"public",
-    table:"antrian"
-  },
-  payload => {
-
-    ambilData();
-
-  }
-)
-.subscribe();
