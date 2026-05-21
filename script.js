@@ -152,6 +152,27 @@ function renderCard(item,index){
           <h3>${item.kategori}</h3>
         </div>
 
+        <div class="info">
+          <small>TANGGAL ORDER</small>
+          <h3>${item.tanggal}</h3>
+        </div>
+
+        <div class="info">
+          <small>ESTIMASI</small>
+          <h3>${item.estimasi}</h3>
+        </div>
+
+        <div class="info">
+          <small>TRANSAKSI</small>
+          <h3>
+            ${
+              item.status === "selesai"
+              ? "DONE"
+              : "PENDING"
+            }
+          </h3>
+        </div>
+
       </div>
 
     </div>
