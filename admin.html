@@ -77,6 +77,11 @@
       <input type="text"
       id="nickname"
       placeholder="Nickname">
+      <input type="date"
+id="tanggalOrder">
+
+<input type="date"
+id="estimasiOrder">
 <select id="kategoriSelect">
 
   <option value="starlight">
@@ -230,11 +235,19 @@
   const kategori =
   document.getElementById("kategoriSelect").value;
 
+  const tanggal =
+  document.getElementById("tanggalOrder").value;
+
+  const estimasi =
+  document.getElementById("estimasiOrder").value;
+
   if(
     nama == "" ||
     produk == "" ||
     server == "" ||
-    nickname == ""
+    nickname == "" ||
+    tanggal == "" ||
+    estimasi == ""
   ){
     alert("Lengkapi data");
     return;
@@ -247,7 +260,10 @@
     server:server,
     nickname:nickname,
     status:status,
-    kategori:kategori
+    kategori:kategori,
+
+    tanggal:tanggal,
+    estimasi:estimasi
 
   });
 
@@ -262,8 +278,11 @@
   document.getElementById("produk").value = "";
   document.getElementById("server").value = "";
   document.getElementById("nickname").value = "";
+  document.getElementById("tanggalOrder").value = "";
+  document.getElementById("estimasiOrder").value = "";
 
 }
+
     function ubahStatus(index,status){
 
       dataAntrian[index].status = status;
@@ -356,6 +375,15 @@
     .red-btn{
       background:#dc2626;
     }
+    #tanggalOrder,
+#estimasiOrder{
+  padding:18px;
+  border:none;
+  background:#f5f5f5;
+  border-radius:18px;
+  font-size:16px;
+  outline:none;
+}
 
   </style>
 
