@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Zhishu Store</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="topbar"></div>
+
+  <!-- NAVBAR -->
+
+  <nav class="navbar">
+
+    <div class="logo">
+
+      <div class="logo-icon">
+        🎮
+      </div>
+
+      <div>
+        <h2>ZHISHU<span>STORE</span></h2>
+        <small>Marketplace Digital</small>
+      </div>
+
+    </div>
+
+<div class="nav-right">
+
+  <button class="theme-btn">
+    ☀️
+  </button>
+
+  <button class="admin-btn"
+  onclick="loginAdmin()">
+    Admin Panel
+  </button>
+
+</div>
+
+  </nav>
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <div class="badge">
+      ✨ Marketplace Digital Terpercaya
+    </div>
+
+    <h1>
+      Zhishu <span>Store</span>
+    </h1>
+
+    <p>
+      Game, aplikasi premium, dan jasa digital dengan harga terjangkau
+    </p>
+
+  </section>
+
+  <!-- STATUS -->
+
+  <!-- NAVBAR MENU -->
+
+<!-- MENU -->
+
+<section class="menu-navbar">
+
+  <button class="menu-btn active"
+  onclick="showPage('semua',this)">
+    Semua
+  </button>
+
+  <button class="menu-btn"
+  onclick="showPage('starlight',this)">
+    Antrean Starlight
+  </button>
+
+  <button class="menu-btn"
+  onclick="showPage('wdp',this)">
+    Antrean WDP
+  </button>
+
+  <button class="menu-btn"
+  onclick="showPage('skin',this)">
+    Antrean Skin
+  </button>
+
+</section>
+
+<!-- STATUS -->
+
+<section class="status-section">
+
+  <div class="badge">
+    ✨ Real-time tracking
+  </div>
+
+  <h1 class="status-title">
+    Status <span>Antrian</span>
+  </h1>
+
+  <p class="order-desc">
+    Semua order yang disetujui admin akan tampil realtime.
+  </p>
+
+  <div class="stats">
+
+    <div class="stat-box">
+      <h4>Total Antrian</h4>
+      <h2 id="total">0</h2>
+    </div>
+
+    <div class="stat-box">
+      <h4>Menunggu</h4>
+      <h2 id="waiting">0</h2>
+    </div>
+
+    <div class="stat-box">
+      <h4>Diproses</h4>
+      <h2 id="process">0</h2>
+    </div>
+
+    <div class="stat-box">
+      <h4>Selesai</h4>
+      <h2 id="done">0</h2>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- LIST -->
+
+<section class="queue-list"
+id="semuaPage">
+
+</section>
+
+<section class="queue-list hidden"
+id="starlightPage">
+
+</section>
+
+<section class="queue-list hidden"
+id="wdpPage">
+
+</section>
+
+<section class="queue-list hidden"
+id="skinPage">
+
+</section>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
