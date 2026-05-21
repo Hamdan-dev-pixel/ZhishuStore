@@ -3,163 +3,196 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Zhishu Store</title>
 
   <link rel="stylesheet" href="style.css">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
-  <div class="topbar"></div>
+<div class="topbar"></div>
 
-  <!-- NAVBAR -->
-
-  <nav class="navbar">
-
-    <div class="logo">
-
-      <div class="logo-icon">
-        🎮
-      </div>
-
-      <div>
-        <h2>ZHISHU<span>STORE</span></h2>
-        <small>Marketplace Digital</small>
-      </div>
-
+<nav class="navbar">
+  <div class="logo">
+    <div class="logo-icon">🎮</div>
+    <div>
+      <h2>ZHISHU<span>STORE</span></h2>
+      <small>Marketplace Digital</small>
     </div>
+  </div>
 
-<div class="nav-right">
+  <div class="nav-right">
+    <button class="theme-btn">☀️</button>
+    <button class="admin-btn" onclick="loginAdmin()">Admin Panel</button>
+  </div>
+</nav>
 
-  <button class="theme-btn">
-    ☀️
-  </button>
-
-  <button class="admin-btn"
-  onclick="loginAdmin()">
-    Admin Panel
-  </button>
-
-</div>
-
-  </nav>
-
-  <!-- HERO -->
-
-  <section class="hero">
-
-    <div class="badge">
-      ✨ Marketplace Digital Terpercaya
-    </div>
-
-    <h1>
-      Zhishu <span>Store</span>
-    </h1>
-
-    <p>
-      Game, aplikasi premium, dan jasa digital dengan harga terjangkau
-    </p>
-
-  </section>
-
-  <!-- STATUS -->
-
-  <!-- NAVBAR MENU -->
-
-<!-- MENU -->
+<section class="hero">
+  <div class="badge">✨ Marketplace Digital Terpercaya</div>
+  <h1>Zhishu <span>Store</span></h1>
+  <p>Game, aplikasi premium, dan jasa digital dengan harga terjangkau</p>
+</section>
 
 <section class="menu-navbar">
-
-  <button class="menu-btn active"
-  onclick="showPage('semua',this)">
-    Semua
-  </button>
-
-  <button class="menu-btn"
-  onclick="showPage('starlight',this)">
-    Antrean Starlight
-  </button>
-
-  <button class="menu-btn"
-  onclick="showPage('wdp',this)">
-    Antrean WDP
-  </button>
-
-  <button class="menu-btn"
-  onclick="showPage('skin',this)">
-    Antrean Skin
-  </button>
-
+  <button class="menu-btn active" onclick="showPage('semua',this)">Semua</button>
+  <button class="menu-btn" onclick="showPage('starlight',this)">Antrean Starlight</button>
+  <button class="menu-btn" onclick="showPage('wdp',this)">Antrean WDP</button>
+  <button class="menu-btn" onclick="showPage('skin',this)">Antrean Skin</button>
 </section>
-
-<!-- STATUS -->
 
 <section class="status-section">
-
-  <div class="badge">
-    ✨ Real-time tracking
-  </div>
-
-  <h1 class="status-title">
-    Status <span>Antrian</span>
-  </h1>
-
-  <p class="order-desc">
-    Semua order yang disetujui admin akan tampil realtime.
-  </p>
+  <div class="badge">✨ Real-time tracking</div>
+  <h1 class="status-title">Status <span>Antrian</span></h1>
+  <p class="order-desc">Semua order yang disetujui admin akan tampil realtime.</p>
 
   <div class="stats">
-
-    <div class="stat-box">
-      <h4>Total Antrian</h4>
-      <h2 id="total">0</h2>
-    </div>
-
-    <div class="stat-box">
-      <h4>Menunggu</h4>
-      <h2 id="waiting">0</h2>
-    </div>
-
-    <div class="stat-box">
-      <h4>Diproses</h4>
-      <h2 id="process">0</h2>
-    </div>
-
-    <div class="stat-box">
-      <h4>Selesai</h4>
-      <h2 id="done">0</h2>
-    </div>
-
+    <div class="stat-box"><h4>Total Antrian</h4><h2 id="total">0</h2></div>
+    <div class="stat-box"><h4>Menunggu</h4><h2 id="waiting">0</h2></div>
+    <div class="stat-box"><h4>Diproses</h4><h2 id="process">0</h2></div>
+    <div class="stat-box"><h4>Selesai</h4><h2 id="done">0</h2></div>
   </div>
-
 </section>
 
-<!-- LIST -->
+<section class="queue-list" id="semuaPage"></section>
+<section class="queue-list hidden" id="starlightPage"></section>
+<section class="queue-list hidden" id="wdpPage"></section>
+<section class="queue-list hidden" id="skinPage"></section>
 
-<section class="queue-list"
-id="semuaPage">
+<style>
+.queue-card{background:#fff;padding:18px;border-radius:18px;box-shadow:0 4px 8px rgba(0,0,0,0.1);margin-bottom:18px}
+.queue-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.tag{background:#f5f5f5;padding:6px 12px;border-radius:12px;font-size:14px}
+.status{padding:6px 12px;border-radius:12px;color:#fff;font-size:14px}
+.status.menunggu{background:#f59e0b}
+.status.diproses{background:#3b82f6}
+.status.selesai{background:#10b981}
+</style>
 
-</section>
+<script>
+/* ================= UI ================= */
+let currentPage = "semua";
 
-<section class="queue-list hidden"
-id="starlightPage">
+function showPage(page, button){
+  currentPage = page;
 
-</section>
+  document.querySelectorAll(".queue-list").forEach(e => e.classList.add("hidden"));
+  document.getElementById(page + "Page").classList.remove("hidden");
 
-<section class="queue-list hidden"
-id="wdpPage">
+  document.querySelectorAll(".menu-btn").forEach(b => b.classList.remove("active"));
+  if(button) button.classList.add("active");
 
-</section>
+  const navbar = document.querySelector(".topbar");
+  const title = document.querySelector(".status-title");
+  const desc = document.querySelector(".order-desc");
 
-<section class="queue-list hidden"
-id="skinPage">
+  if(page === "starlight"){
+    navbar.style.background="#2563eb";
+    title.innerHTML='Antrean <span>Starlight</span>';
+    desc.innerHTML='Realtime order kategori starlight';
+  }
+  else if(page === "wdp"){
+    navbar.style.background="#7c3aed";
+    title.innerHTML='Antrean <span>WDP</span>';
+    desc.innerHTML='Realtime order kategori WDP';
+  }
+  else if(page === "skin"){
+    navbar.style.background="#16a34a";
+    title.innerHTML='Antrean <span>Skin</span>';
+    desc.innerHTML='Realtime order kategori skin';
+  }
+  else{
+    navbar.style.background="#a5ad14";
+    title.innerHTML='Status <span>Antrian</span>';
+    desc.innerHTML='Semua order realtime';
+  }
+}
 
-</section>
+function loginAdmin(){
+  const u = prompt("Masukkan Username");
+  const p = prompt("Masukkan Password");
 
-  <script src="script.js"></script>
+  if(u==="zhishustore" && p==="zhishustore2026"){
+    window.location.href="admin.html";
+  } else {
+    alert("Username atau Password salah");
+  }
+}
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBvAFRVVUmx8zrfa9E8EprvaTjtDyVgM-4",
+  authDomain: "order-2ed47.firebaseapp.com",
+  projectId: "order-2ed47",
+  storageBucket: "order-2ed47.firebasestorage.app",
+  messagingSenderId: "1063088764123",
+  appId: "1:1063088764123:web:0565ef484740fb6a94c8fe"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const semuaPage = document.getElementById("semuaPage");
+const starlightPage = document.getElementById("starlightPage");
+const wdpPage = document.getElementById("wdpPage");
+const skinPage = document.getElementById("skinPage");
+
+function renderCard(item,index){
+  return `
+  <div class="queue-card">
+    <div class="queue-top">
+      <div class="tag">#${index+1}</div>
+      <div class="status ${item.status}">${item.status.toUpperCase()}</div>
+    </div>
+    <div class="info-grid">
+      <div><small>NAMA</small><h3>${item.nama}</h3></div>
+      <div><small>PRODUK</small><h3>${item.produk}</h3></div>
+      <div><small>ID SERVER</small><h3>${item.server}</h3></div>
+      <div><small>NICKNAME</small><h3>${item.nickname}</h3></div>
+      <div><small>KATEGORI</small><h3>${item.kategori}</h3></div>
+      <div><small>TANGGAL</small><h3>${item.tanggal}</h3></div>
+      <div><small>ESTIMASI</small><h3>${item.estimasi}</h3></div>
+    </div>
+  </div>`;
+}
+
+onSnapshot(collection(db,"antrian"),(snapshot)=>{
+
+  const data = snapshot.docs.map(d=>d.data());
+
+  semuaPage.innerHTML="";
+  starlightPage.innerHTML="";
+  wdpPage.innerHTML="";
+  skinPage.innerHTML="";
+
+  let waiting=0,process=0,done=0;
+
+  data.forEach((item,i)=>{
+
+    if(item.status==="menunggu") waiting++;
+    if(item.status==="diproses") process++;
+    if(item.status==="selesai") done++;
+
+    semuaPage.innerHTML+=renderCard(item,i);
+
+    if(item.kategori==="starlight") starlightPage.innerHTML+=renderCard(item,i);
+    if(item.kategori==="wdp") wdpPage.innerHTML+=renderCard(item,i);
+    if(item.kategori==="skin") skinPage.innerHTML+=renderCard(item,i);
+
+  });
+
+  document.getElementById("total").innerText=data.length;
+  document.getElementById("waiting").innerText=waiting;
+  document.getElementById("process").innerText=process;
+  document.getElementById("done").innerText=done;
+
+});
+</script>
 
 </body>
 </html>
