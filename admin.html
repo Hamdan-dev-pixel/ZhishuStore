@@ -11,6 +11,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+
+const SUPABASE_URL =
+"https://bbvgmeqakkdjmiarafqt.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_aG3d7IGH0xsJZogxdRNP-A_QkQXK97a";
+
+const supabase =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+</script>
 <body>
 
   <div class="topbar"></div>
@@ -130,92 +147,149 @@ id="estimasiOrder">
   </section>
 
   <script>
+let dataAntrian = [];
 
-    let dataAntrian =
-    JSON.parse(localStorage.getItem("antrian")) || [];
+const adminList =
+document.getElementById("adminList");
 
-    const adminList =
-    document.getElementById("adminList");
+async function renderAdmin(){
 
-    function renderAdmin(){
+  const {
+    data,
+    error
+  } = await supabase
+  .from("antrian")
+  .select("*")
+  .order("id",{ascending:false});
 
-      adminList.innerHTML = "";
+  if(error){
 
-      dataAntrian.forEach((item,index)=>{
+    console.log(error);
+    return;
 
-        adminList.innerHTML += `
+  }
 
-          <div class="queue-card">
+  dataAntrian = data;
 
-            <div class="queue-top">
+  adminList.innerHTML = "";
 
-              <div class="tag">
-                #${index + 1}
-              </div>
+  dataAntrian.forEach((item,index)=>{
 
-              <div class="status ${item.status}">
-                ${item.status.toUpperCase()}
-              </div>
+    adminList.innerHTML += `
 
-            </div>
+      <div class="queue-card">
 
-            <div class="info-grid">
+        <div class="queue-top">
 
-              <div class="info">
-                <small>NAMA</small>
-                <h3>${item.nama}</h3>
-              </div>
-
-              <div class="info">
-                <small>PRODUK</small>
-                <h3>${item.produk}</h3>
-              </div>
-
-              <div class="info">
-                <small>ID SERVER</small>
-                <h3>${item.server}</h3>
-              </div>
-
-              <div class="info">
-                <small>NICKNAME</small>
-                <h3>${item.nickname}</h3>
-              </div>
-
-            </div>
-
-            <div class="admin-action">
-
-              <button onclick="ubahStatus(${index},'menunggu')"
-              class="yellow-btn">
-                Menunggu
-              </button>
-
-              <button onclick="ubahStatus(${index},'diproses')"
-              class="blue-btn">
-                Diproses
-              </button>
-
-              <button onclick="ubahStatus(${index},'selesai')"
-              class="green-btn">
-                Selesai
-              </button>
-
-              <button onclick="hapusOrder(${index})"
-              class="red-btn">
-                Hapus
-              </button>
-
-            </div>
-
+          <div class="tag">
+            #${index + 1}
           </div>
 
-        `;
+          <div class="status ${item.status}">
+            ${item.status.toUpperCase()}
+          </div>
 
-      });
+        </div>
 
-    }
+        <div class="info-grid">
 
-    function tambahOrder(){
+          <div class="info">
+            <small>NAMA</small>
+            <h3>${item.nama}</h3>
+          </div>
+
+          <div class="info">
+            <small>PRODUK</small>
+            <h3>${item.produk}</h3>
+          </div>
+
+          <div class="info">
+            <small>ID SERVER</small>
+            <h3>${item.server}</h3>
+          </div>
+
+          <div class="info">
+            <small>NICKNAME</small>
+            <h3>${item.nickname}</h3>
+          </div>
+
+        </div>
+
+        <div class="admin-action">
+
+          <button onclick="ubahStatus(${item.id},'menunggu')"
+          class="yellow-btn">
+            Menunggu
+          </button>
+
+          <button onclick="ubahStatus(${item.id},'diproses')"
+          class="blue-btn">
+            Diproses
+          </button>
+
+          <button onclick="ubahStatus(${item.id},'selesai')"
+          class="green-btn">
+            Selesai
+          </button>
+
+          <button onclick="hapusOrder(${item.id})"
+          class="red-btn">
+            Hapus
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+async function ubahStatus(id,status){
+
+  await supabase
+  .from("antrian")
+  .update({
+    status:status
+  })
+  .eq("id",id);
+
+  renderAdmin();
+
+}
+
+async function hapusOrder(id){
+
+  await supabase
+  .from("antrian")
+  .delete()
+  .eq("id",id);
+
+  renderAdmin();
+
+}
+
+renderAdmin();
+
+supabase
+.channel("admin-realtime")
+.on(
+  "postgres_changes",
+  {
+    event:"*",
+    schema:"public",
+    table:"antrian"
+  },
+  payload => {
+
+    renderAdmin();
+
+  }
+)
+.subscribe();
+async function tambahOrder(){
 
   const nama =
   document.getElementById("nama").value;
@@ -249,11 +323,16 @@ id="estimasiOrder">
     tanggal == "" ||
     estimasi == ""
   ){
+
     alert("Lengkapi data");
     return;
+
   }
 
-  dataAntrian.push({
+  const { error } =
+  await supabase
+  .from("antrian")
+  .insert([{
 
     nama:nama,
     produk:produk,
@@ -261,18 +340,20 @@ id="estimasiOrder">
     nickname:nickname,
     status:status,
     kategori:kategori,
-
     tanggal:tanggal,
     estimasi:estimasi
 
-  });
+  }]);
 
-  localStorage.setItem(
-    "antrian",
-    JSON.stringify(dataAntrian)
-  );
+  if(error){
 
-  renderAdmin();
+    console.log(error);
+    alert("Gagal tambah order");
+    return;
+
+  }
+
+  alert("Order berhasil ditambahkan");
 
   document.getElementById("nama").value = "";
   document.getElementById("produk").value = "";
@@ -281,45 +362,9 @@ id="estimasiOrder">
   document.getElementById("tanggalOrder").value = "";
   document.getElementById("estimasiOrder").value = "";
 
+  renderAdmin();
+
 }
-
-    function ubahStatus(index,status){
-
-      dataAntrian[index].status = status;
-
-      localStorage.setItem(
-        "antrian",
-        JSON.stringify(dataAntrian)
-      );
-
-      renderAdmin();
-
-    }
-
-    function hapusOrder(index){
-
-      dataAntrian.splice(index,1);
-
-      localStorage.setItem(
-        "antrian",
-        JSON.stringify(dataAntrian)
-      );
-
-      renderAdmin();
-
-    }
-
-    renderAdmin();
-
-    setInterval(()=>{
-
-      dataAntrian =
-      JSON.parse(localStorage.getItem("antrian")) || [];
-
-      renderAdmin();
-
-    },1000);
-
   </script>
 
   <style>
