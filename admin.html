@@ -79,11 +79,12 @@
       placeholder="Nickname">
       <input type="date"
 id="tanggalOrder">
-
 <input type="date"
 id="estimasiOrder">
+<input type="text"
+      id="akunGift"
+      placeholder="ID Akun Gift (Opsional)">
 <select id="kategoriSelect">
-
   <option value="starlight">
     Starlight
   </option>
@@ -95,6 +96,8 @@ id="estimasiOrder">
   <option value="skin">
     Skin
   </option>
+    <option value="callback">
+        Callback
 
 </select>
       <select id="statusSelect">
@@ -221,16 +224,45 @@ const adminList = document.getElementById("adminList");
 
 /* REALTIME */
 onSnapshot(collection(db, "antrian"), (snapshot) => {
+
   adminList.innerHTML = "";
 
-  snapshot.forEach((item) => {
-    const data = item.data();
+  // AMBIL DATA
+  let dataList = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  // SORT STATUS + CREATED AT
+  dataList.sort((a, b) => {
+
+    const statusOrder = {
+      "menunggu": 1,
+      "diproses": 2,
+      "selesai": 3
+    };
+
+    const statusA = statusOrder[(a.status || "").toLowerCase()] || 99;
+    const statusB = statusOrder[(b.status || "").toLowerCase()] || 99;
+
+    // PRIORITAS STATUS
+    if(statusA !== statusB){
+      return statusA - statusB;
+    }
+
+    // JIKA STATUS SAMA
+    return a.createdAt - b.createdAt;
+  });
+
+  // RENDER
+  dataList.forEach((data, index) => {
 
     adminList.innerHTML += `
       <div class="queue-card">
 
         <div class="queue-top">
-          <div class="tag">#${item.id.slice(0,4)}</div>
+          <div class="tag">#${index + 1}</div>
+
           <div class="status ${data.status}">
             ${data.status.toUpperCase()}
           </div>
@@ -241,18 +273,26 @@ onSnapshot(collection(db, "antrian"), (snapshot) => {
           <div class="info"><small>PRODUK</small><h3>${data.produk}</h3></div>
           <div class="info"><small>ID SERVER</small><h3>${data.server}</h3></div>
           <div class="info"><small>NICKNAME</small><h3>${data.nickname}</h3></div>
+          <div class="info"><small>KATEGORI</small><h3>${data.kategori}</h3></div>
+          <div class="info"><small>TANGGAL</small><h3>${data.tanggal}</h3></div>
+          <div class="info"><small>ESTIMASI</small><h3>${data.estimasi}</h3></div>
+          <div class="info"><small>Akun Gift</small><h3>${data.akunGift || "-"}</h3></div>
         </div>
 
         <div class="admin-action">
-          <button onclick="ubahStatus('${item.id}','menunggu')" class="yellow-btn">Menunggu</button>
-          <button onclick="ubahStatus('${item.id}','diproses')" class="blue-btn">Diproses</button>
-          <button onclick="ubahStatus('${item.id}','selesai')" class="green-btn">Selesai</button>
-          <button onclick="hapusOrder('${item.id}')" class="red-btn">Hapus</button>
+          <button onclick="ubahStatus('${data.id}','menunggu')" class="yellow-btn">Menunggu</button>
+
+          <button onclick="ubahStatus('${data.id}','diproses')" class="blue-btn">Diproses</button>
+
+          <button onclick="ubahStatus('${data.id}','selesai')" class="green-btn">Selesai</button>
+
+          <button onclick="hapusOrder('${data.id}')" class="red-btn">Hapus</button>
         </div>
 
       </div>
     `;
   });
+
 });
 
 /* TAMBAH */
@@ -266,6 +306,7 @@ window.tambahOrder = async function () {
   const kategori = document.getElementById("kategoriSelect").value;
   const tanggal = document.getElementById("tanggalOrder").value;
   const estimasi = document.getElementById("estimasiOrder").value;
+  const akunGift = document.getElementById("akunGift").value;
 
   if (!nama || !produk || !server || !nickname) {
     alert("Lengkapi data!");
@@ -281,6 +322,7 @@ window.tambahOrder = async function () {
     kategori,
     tanggal,
     estimasi,
+    akunGift,
     createdAt: Date.now()
   });
 
