@@ -160,6 +160,27 @@ onSnapshot(collection(db, "antrian"), (snapshot) => {
   // AMBIL DATA FIREBASE
   allData = snapshot.docs.map(doc => doc.data());
 
+  /* URUTKAN DATA TERLAMA -> TERBARU */
+allData.sort((a, b) => {
+
+  const statusOrder = {
+    "menunggu": 1,
+    "diproses": 2,
+    "selesai": 3
+  };
+
+  const statusA = statusOrder[norm(a.status)] || 99;
+  const statusB = statusOrder[norm(b.status)] || 99;
+
+  // PRIORITAS STATUS
+  if(statusA !== statusB){
+    return statusA - statusB;
+  }
+
+  // JIKA STATUS SAMA → URUT CREATED AT
+  return a.createdAt - b.createdAt;
+});
+
   // RESET PAGE
   semuaPage.innerHTML = "";
   starlightPage.innerHTML = "";
