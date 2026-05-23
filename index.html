@@ -148,6 +148,7 @@ function renderCard(item, index) {
         <div class="info"><small>KATEGORI</small><h3>${item.kategori || "-"}</h3></div>
         <div class="info"><small>TANGGAL</small><h3>${item.tanggal || "-"}</h3></div>
         <div class="info"><small>ESTIMASI</small><h3>${item.estimasi || "-"}</h3></div>
+         <div class="info"><small>Akun Gift</small><h3>${item.akunGift || "-"}</h3></div>
       </div>
     </div>
   `;
@@ -160,7 +161,7 @@ onSnapshot(collection(db, "antrian"), (snapshot) => {
   // AMBIL DATA FIREBASE
   allData = snapshot.docs.map(doc => doc.data());
 
-  /* URUTKAN DATA TERLAMA -> TERBARU */
+/* URUTKAN DATA TERLAMA -> TERBARU */
 allData.sort((a, b) => {
 
   const statusOrder = {
@@ -182,10 +183,7 @@ allData.sort((a, b) => {
 });
 
   // RESET PAGE
-  semuaPage.innerHTML = "";
-  starlightPage.innerHTML = "";
-  wdpPage.innerHTML = "";
-  skinPage.innerHTML = "";
+
 
   // ================= GLOBAL =================
   let global = {
@@ -215,20 +213,22 @@ allData.sort((a, b) => {
     if(status === "selesai") global.done++;
 
     // FILTER CATEGORY
-    if(kategori === "starlight"){
-      starlightData.push(item);
-    }
+// FILTER CATEGORY EXACT
+if(kategori === "starlight"){
+  starlightData.push(item);
+}
 
-    if(kategori === "wdp"){
-      wdpData.push(item);
-    }
+else if(kategori === "wdp"){
+  wdpData.push(item);
+}
 
-    if(kategori === "skin"){
-      skinData.push(item);
-    }
-    if(kategori === "callback"){
-      callbackData.push(item);
-    }
+else if(kategori === "skin"){
+  skinData.push(item);
+}
+
+else if(kategori === "callback"){
+  callbackData.push(item);
+}
   });
 
   // ================= RENDER =================
