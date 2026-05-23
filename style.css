@@ -287,6 +287,9 @@ body{
   overflow-wrap: anywhere;
   white-space: normal;
 }
+.hidden{
+  display:none !important;
+}
 /* MOBILE OPTIMIZE */
 
 @media(max-width:768px){
