@@ -228,6 +228,17 @@ body{
   width:100%;
   max-width:100%;
   overflow:hidden;
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:15px;
+}
+
+.queue-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
 }
 
 .info-grid{
@@ -287,9 +298,21 @@ body{
     margin:15px;
   }
 
-  .queue-card{
-    padding:12px;
-  }
+.queue-card{
+  width:100%;
+  max-width:100%;
+  overflow:hidden;
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:15px;
+}
+.queue-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
 }
   .hero h1{
     font-size:45px;
@@ -332,11 +355,6 @@ body{
   background:#293a61;
   color:white;
 }
-@media(max-width:768px){
-
-  .container{
-    padding:15px;
-  }
 
   .status-title{
     font-size:42px;
@@ -347,47 +365,6 @@ body{
     grid-template-columns:1fr 1fr;
   }
 
-  .queue-card{
-    padding:12px;
-  }
-
-  /* 🔥 INI YANG DIPERBAIKI */
-  .info-grid{
-    display:grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap:8px;
-  }
-
-  .info{
-    min-width:0;
-  }
-
-  .info h3{
-    font-size:13px;
-    word-break:break-word;
-    overflow-wrap:anywhere;
-  }
-
-  .queue-top{
-    flex-direction:column;
-    gap:15px;
-    align-items:flex-start;
-  }
-
-  .stat-box{
-    min-height:120px;
-    padding:20px;
-  }
-}
-html, body{
-  width:100%;
-  max-width:100%;
-  overflow-x:hidden;
-}
-*{
-  box-sizing:border-box;
-}
-
-img, div, section{
-  max-width:100%;
+.hidden{
+  display:none !important;
 }
