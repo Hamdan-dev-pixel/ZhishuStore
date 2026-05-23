@@ -37,9 +37,10 @@
 
 <section class="menu-navbar">
   <button class="menu-btn active" onclick="showPage('semua',this)">Semua</button>
-  <button class="menu-btn" onclick="showPage('starlight',this)">Antrean Starlight</button>
-  <button class="menu-btn" onclick="showPage('wdp',this)">Antrean WDP</button>
-  <button class="menu-btn" onclick="showPage('skin',this)">Antrean Skin</button>
+  <button class="menu-btn" onclick="showPage('starlight',this)">Antrian Starlight</button>
+  <button class="menu-btn" onclick="showPage('wdp',this)">Antrian WDP</button>
+  <button class="menu-btn" onclick="showPage('skin',this)">Antrian Skin</button>
+  <button class="menu-btn" onclick="showPage('callback',this)">Antrian Callback</button>
 </section>
 
 <section class="status-section">
@@ -59,6 +60,7 @@
 <section class="queue-list hidden" id="starlightPage"></section>
 <section class="queue-list hidden" id="wdpPage"></section>
 <section class="queue-list hidden" id="skinPage"></section>
+<section class="queue-list hidden" id="callbackPage"></section>
 
 <script>
 /* ================= UI ================= */
@@ -122,6 +124,7 @@ const semuaPage = document.getElementById("semuaPage");
 const starlightPage = document.getElementById("starlightPage");
 const wdpPage = document.getElementById("wdpPage");
 const skinPage = document.getElementById("skinPage");
+const callbackPage = document.getElementById("callbackPage");
 
 /* ================= NORMALIZER (WAJIB) ================= */
 const norm = (v) => (v || "").toString().toLowerCase().trim();
@@ -175,6 +178,7 @@ onSnapshot(collection(db, "antrian"), (snapshot) => {
   let starlightData = [];
   let wdpData = [];
   let skinData = [];
+  let callbackData = [];
 
   // LOOP DATA
   allData.forEach(item => {
@@ -201,6 +205,9 @@ onSnapshot(collection(db, "antrian"), (snapshot) => {
     if(kategori === "skin"){
       skinData.push(item);
     }
+    if(kategori === "callback"){
+      callbackData.push(item);
+    }
   });
 
   // ================= RENDER =================
@@ -216,6 +223,7 @@ onSnapshot(collection(db, "antrian"), (snapshot) => {
   renderList(starlightData, starlightPage);
   renderList(wdpData, wdpPage);
   renderList(skinData, skinPage);
+  renderList(callbackData, callbackPage);
 
   // ================= COUNT STATUS =================
   function countStatus(list){
@@ -239,7 +247,7 @@ onSnapshot(collection(db, "antrian"), (snapshot) => {
   const starlight = countStatus(starlightData);
   const wdp = countStatus(wdpData);
   const skin = countStatus(skinData);
-
+  const callback = countStatus(callbackData);
   // ================= UPDATE UI =================
   function setUI(obj){
     document.getElementById("total").innerText = obj.total;
@@ -263,6 +271,9 @@ onSnapshot(collection(db, "antrian"), (snapshot) => {
   if(currentPage === "skin"){
     setUI(skin);
   }
+  if(currentPage === "callback"){
+        setUI(callback);
+    }
   // ================= REFRESH SAAT PINDAH MENU =================
   window.addEventListener("refreshStats", () => {
 
@@ -280,6 +291,10 @@ onSnapshot(collection(db, "antrian"), (snapshot) => {
 
     if(currentPage === "skin"){
       setUI(skin);
+    }
+
+    if(currentPage === "callback"){
+      setUI(callback);
     }
 
   });
