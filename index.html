@@ -64,39 +64,25 @@
 /* ================= UI ================= */
 let currentPage = "semua";
 
-function showPage(page, button){
+window.showPage = function(page, btn){
+
   currentPage = page;
 
-  document.querySelectorAll(".queue-list").forEach(e => e.classList.add("hidden"));
-  document.getElementById(page + "Page").classList.remove("hidden");
+  document.querySelectorAll(".queue-list").forEach(el=>{
+    el.classList.add("hidden");
+  });
 
-  document.querySelectorAll(".menu-btn").forEach(b => b.classList.remove("active"));
-  if(button) button.classList.add("active");
+  document.getElementById(page + "Page")
+  .classList.remove("hidden");
 
-  const navbar = document.querySelector(".topbar");
-  const title = document.querySelector(".status-title");
-  const desc = document.querySelector(".order-desc");
+  document.querySelectorAll(".menu-btn")
+  .forEach(b=>b.classList.remove("active"));
 
-  if(page === "starlight"){
-    navbar.style.background="#2563eb";
-    title.innerHTML='Antrean <span>Starlight</span>';
-    desc.innerHTML='Realtime order kategori starlight';
-  }
-  else if(page === "wdp"){
-    navbar.style.background="#7c3aed";
-    title.innerHTML='Antrean <span>WDP</span>';
-    desc.innerHTML='Realtime order kategori WDP';
-  }
-  else if(page === "skin"){
-    navbar.style.background="#16a34a";
-    title.innerHTML='Antrean <span>Skin</span>';
-    desc.innerHTML='Realtime order kategori skin';
-  }
-  else{
-    navbar.style.background="#a5ad14";
-    title.innerHTML='Status <span>Antrian</span>';
-    desc.innerHTML='Semua order realtime';
-  }
+  if(btn) btn.classList.add("active");
+
+  // PAKSA REFRESH ANGKA
+  const event = new Event("refreshStats");
+  window.dispatchEvent(event);
 }
 
 function loginAdmin(){
@@ -115,6 +101,7 @@ function loginAdmin(){
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyBvAFRVVUmx8zrfa9E8EprvaTjtDyVgM-4",
   authDomain: "order-2ed47.firebaseapp.com",
@@ -127,78 +114,175 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+/* ================= STATE GLOBAL ================= */
+window.currentPage = "semua";
+
+/* ================= ELEMENT ================= */
 const semuaPage = document.getElementById("semuaPage");
 const starlightPage = document.getElementById("starlightPage");
 const wdpPage = document.getElementById("wdpPage");
 const skinPage = document.getElementById("skinPage");
 
-function renderCard(item,index){
+/* ================= NORMALIZER (WAJIB) ================= */
+const norm = (v) => (v || "").toString().toLowerCase().trim();
+
+/* ================= RENDER ================= */
+function renderCard(item, index) {
   return `
-  <div class="queue-card">
-    <div class="queue-top">
-      <div class="tag">#${index+1}</div>
-      <div class="status ${item.status}">${item.status.toUpperCase()}</div>
+    <div class="queue-card">
+      <div class="queue-top">
+        <div class="tag">#${index + 1}</div>
+        <div class="status ${norm(item.status)}">
+          ${norm(item.status).toUpperCase()}
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info"><small>NAMA</small><h3>${item.nama || "-"}</h3></div>
+        <div class="info"><small>PRODUK</small><h3>${item.produk || "-"}</h3></div>
+        <div class="info"><small>ID SERVER</small><h3>${item.server || "-"}</h3></div>
+        <div class="info"><small>NICKNAME</small><h3>${item.nickname || "-"}</h3></div>
+        <div class="info"><small>KATEGORI</small><h3>${item.kategori || "-"}</h3></div>
+        <div class="info"><small>TANGGAL</small><h3>${item.tanggal || "-"}</h3></div>
+        <div class="info"><small>ESTIMASI</small><h3>${item.estimasi || "-"}</h3></div>
+      </div>
     </div>
-
-    <div class="info-grid">
-
-  <div class="info-row">
-    <div class="info"><small>NAMA</small><h3>${item.nama}</h3></div>
-    <div class="info"><small>PRODUK</small><h3>${item.produk}</h3></div>
-  </div>
-
-  <div class="info-row">
-    <div class="info"><small>ID SERVER</small><h3>${item.server}</h3></div>
-    <div class="info"><small>NICKNAME</small><h3>${item.nickname}</h3></div>
-  </div>
-
-  <div class="info-row">
-    <div class="info"><small>KATEGORI</small><h3>${item.kategori}</h3></div>
-    <div class="info"><small>TANGGAL</small><h3>${item.tanggal}</h3></div>
-  </div>
-
-  <div class="info-row">
-    <div class="info"><small>ESTIMASI</small><h3>${item.estimasi}</h3></div>
-    <div class="info">
-      <small>TRANSAKSI</small>
-      <h3>${item.status === "selesai" ? "DONE" : "PENDING"}</h3>
-    </div>
-  </div>
-
-</div>
-  </div>`;
+  `;
 }
+/* ================= REALTIME ================= */
+let allData = [];
 
-onSnapshot(collection(db,"antrian"),(snapshot)=>{
+onSnapshot(collection(db, "antrian"), (snapshot) => {
 
-  const data = snapshot.docs.map(d=>d.data());
+  // AMBIL DATA FIREBASE
+  allData = snapshot.docs.map(doc => doc.data());
 
-  semuaPage.innerHTML="";
-  starlightPage.innerHTML="";
-  wdpPage.innerHTML="";
-  skinPage.innerHTML="";
+  // RESET PAGE
+  semuaPage.innerHTML = "";
+  starlightPage.innerHTML = "";
+  wdpPage.innerHTML = "";
+  skinPage.innerHTML = "";
 
-  let waiting=0,process=0,done=0;
+  // ================= GLOBAL =================
+  let global = {
+    total: 0,
+    waiting: 0,
+    process: 0,
+    done: 0
+  };
 
-  data.forEach((item,i)=>{
+  // ================= FILTER DATA =================
+  let starlightData = [];
+  let wdpData = [];
+  let skinData = [];
 
-    if(item.status==="menunggu") waiting++;
-    if(item.status==="diproses") process++;
-    if(item.status==="selesai") done++;
+  // LOOP DATA
+  allData.forEach(item => {
 
-    semuaPage.innerHTML+=renderCard(item,i);
+    const kategori = norm(item.kategori);
+    const status = norm(item.status);
 
-    if(item.kategori==="starlight") starlightPage.innerHTML+=renderCard(item,i);
-    if(item.kategori==="wdp") wdpPage.innerHTML+=renderCard(item,i);
-    if(item.kategori==="skin") skinPage.innerHTML+=renderCard(item,i);
+    // GLOBAL COUNT
+    global.total++;
 
+    if(status === "menunggu") global.waiting++;
+    if(status === "diproses") global.process++;
+    if(status === "selesai") global.done++;
+
+    // FILTER CATEGORY
+    if(kategori === "starlight"){
+      starlightData.push(item);
+    }
+
+    if(kategori === "wdp"){
+      wdpData.push(item);
+    }
+
+    if(kategori === "skin"){
+      skinData.push(item);
+    }
   });
 
-  document.getElementById("total").innerText=data.length;
-  document.getElementById("waiting").innerText=waiting;
-  document.getElementById("process").innerText=process;
-  document.getElementById("done").innerText=done;
+  // ================= RENDER =================
+  function renderList(list, container){
+    container.innerHTML = "";
 
+    list.forEach((item, index)=>{
+      container.innerHTML += renderCard(item, index);
+    });
+  }
+
+  renderList(allData, semuaPage);
+  renderList(starlightData, starlightPage);
+  renderList(wdpData, wdpPage);
+  renderList(skinData, skinPage);
+
+  // ================= COUNT STATUS =================
+  function countStatus(list){
+    return {
+      total: list.length,
+
+      waiting: list.filter(
+        i => norm(i.status) === "menunggu"
+      ).length,
+
+      process: list.filter(
+        i => norm(i.status) === "diproses"
+      ).length,
+
+      done: list.filter(
+        i => norm(i.status) === "selesai"
+      ).length
+    };
+  }
+
+  const starlight = countStatus(starlightData);
+  const wdp = countStatus(wdpData);
+  const skin = countStatus(skinData);
+
+  // ================= UPDATE UI =================
+  function setUI(obj){
+    document.getElementById("total").innerText = obj.total;
+    document.getElementById("waiting").innerText = obj.waiting;
+    document.getElementById("process").innerText = obj.process;
+    document.getElementById("done").innerText = obj.done;
+  }
+
+  if(currentPage === "semua"){
+    setUI(global);
+  }
+
+  if(currentPage === "starlight"){
+    setUI(starlight);
+  }
+
+  if(currentPage === "wdp"){
+    setUI(wdp);
+  }
+
+  if(currentPage === "skin"){
+    setUI(skin);
+  }
+  // ================= REFRESH SAAT PINDAH MENU =================
+  window.addEventListener("refreshStats", () => {
+
+    if(currentPage === "semua"){
+      setUI(global);
+    }
+
+    if(currentPage === "starlight"){
+      setUI(starlight);
+    }
+
+    if(currentPage === "wdp"){
+      setUI(wdp);
+    }
+
+    if(currentPage === "skin"){
+      setUI(skin);
+    }
+
+  });
 });
 </script>
 
